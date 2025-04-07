@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    {% block head %}
+    
+
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/main.css' %}" />
+    <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.js" integrity="sha384-oeUn82QNXPuVkGCkcrInrS1twIxKhkZiFfr2TdiuObZ3n3yIeMiqcRzkIcguaof1" crossorigin="anonymous"></script>
+    <title>{% block title %}{% endblock %} - My Webpage</title>
+    
+    {% endblock %}
+</head>
+<body>
+    
+    
+
+    {% block header %}
+
+    <div>
+        {% block header_content %}
+        {% endblock %}
+        <nav class="navbar ">
+      <ul>
+        <li><a href="{% url 'index' %}">Home</a></li>
+        <li><a href="{% url 'about' %}">About</a></li>
+        <li><a href="{% url 'projects' %}">Projects</a></li>
+        <li><a href="{% url 'tasks' %}">Tasks</a></li>
+        <li><a href="{% url 'create_task' %}">Create Task</a></li>
+        <li><a href="{% url 'create_projects' %}">Create Project</a></li>
+        <li><a href="{% url 'signup' %}">Signup</a></li>
+      </ul>
+      </nav>
+    </div>
+    {% endblock %}
+
+    
+    <div class="container">
+      {% block content %}
+      {% endblock %}
+    </div>
+
+
+
+
+    <div id="footer">
+        {% block footer %}
+        {% endblock %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    {% block head %}
+     
+
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/main.css' %}" />
+    <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.js" integrity="sha384-oeUn82QNXPuVkGCkcrInrS1twIxKhkZiFfr2TdiuObZ3n3yIeMiqcRzkIcguaof1" crossorigin="anonymous"></script>
+    <title>{% block title %}{% endblock %} - My Webpage</title>
+    
+    {% endblock %}
+</head>
+<body>
+    
+    
+
+    {% block header %}
+
+    <div>
+        {% block header_content %}
+        {% endblock %}
+     
+    {% endblock %}
+
+    
+    <div class="container">
+      {% block content %}
+      {% endblock %}
+    </div>
+
+
+
+
+    <div id="footer">
+        {% block footer %}
+        {% endblock %}
+    </div>
+
+</body>
+</html>
