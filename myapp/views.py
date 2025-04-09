@@ -132,7 +132,9 @@ def update_task(request, id):
         form = CreateTaskForm(request.POST, instance=task, user=request.user)
         if form.is_valid():
             form.save()
-            return redirect('project_detail', id=task.project.id)
+            response = HttpResponse(status=200)
+            response['HX-Redirect'] = '/project/' + str(task.project.id)  
+            return response
     else:
         form = CreateTaskForm(instance=task, user=request.user)
 
