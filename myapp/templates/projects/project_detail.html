@@ -4,9 +4,21 @@
 
 <h1>Project Detail</h1>
 <p>{{ project.name }}</p>
-
 {% for task in tasks %}
-    <p class="card">{{ task.title }}</p>
+  Tasks:
+
+    <p class="card"> Title: {%if task.done %} ✅ {%else%} 🕐 {% endif %} {{ task.title }}</p>
+    <p class="card"> Description: {{ task.description }}</p>
+    <p class="card"> Done: {{ task.done }}</p>
+
+    <form method="post"  >
+        {% csrf_token %}
+    <div id="task-{{ task.id }}">
+    <button hx-post="{% url 'delete_task' task.id %}" hx-target="#task-{{ task.id }}"  hx-swap="innerHTML" hx.loading type="submit">Delete</button>
+    <button hx-get="{% url 'update_task' task.id %}" hx-target="#task-{{ task.id }}"  hx-swap="innerHTML" hx.loading type="submit">Edit</button>
+    </form>
+
+    </div>
 {% endfor %}
 
 

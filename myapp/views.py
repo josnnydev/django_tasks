@@ -1,17 +1,16 @@
 from django.shortcuts import get_object_or_404, render,redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse 
 from myapp.forms import CreateTaskForm,CreateProjectForm 
 from myapp.models import Project, Task
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login
- 
- 
-def index(request):
-    return render(request, 'index.html',status=200 )
-
+from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
+from django.contrib.auth import login,logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
+def index(request):
+    return render(request, 'index.html',status=200 )
 
 def signup(request):
     if request.method == 'POST':
@@ -29,6 +28,23 @@ def signup(request):
         form = UserCreationForm()
 
     return render(request, 'signup/signup.html', {'form': form})
+
+def signin(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            login(request, form.get_user())
+            return redirect('create_task')
+        else:
+            return render(request, 'signin/signin.html', {'form': form, 'error': 'User not found, Please Signup .'})
+    else:
+        form = AuthenticationForm()
+
+    return render(request, 'signin/signin.html', {'form': form})
+
+def signout(request):
+    logout(request)
+    return redirect('index')
   
      
 
@@ -36,57 +52,75 @@ def signup(request):
 def about(request):
     return render(request, 'about.html',status=200 ) 
 
+@login_required
 def projects(request):
-    projects =Project.objects.all()
+    projects =Project.objects.filter(user=request.user)
+    
     
      
     return render(request,'projects/projects.html', {'projects': projects}) 
 
-def tasks(request):
-    tasks = Task.objects.all()
     
-    return render(request,'tasks/tasks.html', {'tasks': tasks})    
 
 
-def task(request, id):
-    if not Task.objects.filter(id=id).exists():
-        return get_object_or_404(Task, id=id)
-    else:    
-        task = Task.objects.get(id=id)
-        return JsonResponse(task.title,safe=False,status=200 )    
-
+@login_required
 def create_task(request):
     if request.method == 'POST':
-        form = CreateTaskForm(request.POST)
+        form = CreateTaskForm(request.POST, user=request.user)  # ✅ Agrega 'user' aquí también
         if form.is_valid():
-            form.save()
-            
-            return redirect('tasks')
-    else:
-        form = CreateTaskForm()
-    return render(request, 'tasks/create_task.html', {'form': form})
-
-def create_projects(request):
-    if request.method == 'POST':
-        form = CreateProjectForm(request.POST)
-        if form.is_valid():
-            form.save()
-            
+            task = form.save(commit=False)
+            task.user = request.user
+            task.save()
             return redirect('projects')
     else:
-        form = CreateProjectForm()
+        form = CreateTaskForm(user=request.user)  # Esto ya estaba bien
+    return render(request, 'tasks/create_task.html', {'form': form})
+
+@login_required
+def create_projects(request):
+    if request.method == 'POST':
+        form = CreateProjectForm(request.POST, user=request.user)  # ✅ Aquí también
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.user = request.user
+            project.save()
+            return redirect('projects')
+    else:
+        form = CreateProjectForm(user=request.user)  # Esto está bien
     return render(request, 'projects/create_projects.html', {'form': form})
 
+@login_required
 def project_detail(request, id):
-    project = get_object_or_404(Project, id=id)
-    tasks = Task.objects.filter(project__id=id)
+    project = get_object_or_404(Project, id=id,user=request.user)
+    tasks = Task.objects.filter(project__id=id,user=request.user)
     return render(request, 'projects/project_detail.html', {'project': project, 'tasks': tasks})
 
+ 
+@login_required
 def delete_task(request, id):
-    task = get_object_or_404(Task, id=id)
+    task = get_object_or_404(Task, id=id,user=request.user)
     task.delete()
     response = HttpResponse(status=200)
-    response['HX-Redirect'] = '/tasks'   
+    response['HX-Redirect'] = '/projects'    
     return response
+
+@login_required
+def update_task(request, id):
+    task = get_object_or_404(Task, id=id, user=request.user)
+
+    if request.method == 'POST':
+         
+        form = CreateTaskForm(request.POST, instance=task, user=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('project_detail', id=task.project.id)
+    else:
+        form = CreateTaskForm(instance=task, user=request.user)
+
+    return render(request, 'tasks/update_task.html', {'form': form, 'task': task})
+
+
+ 
+
 
 

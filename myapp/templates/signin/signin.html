@@ -1,0 +1,14 @@
+{% extends 'layouts/base2.html' %}
+{% block content %}
+{% block title %}Signin{% endblock %}
+
+<h1>Signin</h1>
+
+{{error}}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="form-control" type="submit">Signin</button>
+</form>
+
+{% endblock %}

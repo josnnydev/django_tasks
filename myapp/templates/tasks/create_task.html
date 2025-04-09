@@ -3,6 +3,7 @@
 {% block title %}Create Task{% endblock %}
 
 <h1>Create Task</h1>
+
 <form   method="post">
     {% csrf_token %}
     {{ form.as_p }}
