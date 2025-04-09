@@ -1,14 +1,19 @@
-{% extends 'layouts/base2.html' %}
+
+{% extends 'layouts/base.html' %}
 {% block content %}
 {% block title %}Projects{% endblock %}
 
- 
+
+
 {% for project in projects %}
-<article >
-    <p class="card"><a  href="{% url 'project_detail' project.id %}"> {{ project.name }}  </a></p>   
+<article class=" " >
+ 
+    <a class="card card-body" href="{% url 'project_detail' project.id %}"> {{ project.name }}</a>  
+
     {%empty%}
         <p>No projects available</p>
-</article>
-    {% endfor %}
+    </article>
+        {% endfor %}
+ 
  
 {% endblock %}

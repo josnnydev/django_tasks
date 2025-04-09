@@ -8,26 +8,45 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError
+from django.contrib.auth.models import User
 
 def index(request):
     return render(request, 'index.html',status=200 )
 
-def signup(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)   
-            return redirect('create_task')
-        else:
-            return render(request, 'signup/signup.html', {
-                'form': form,
-                'error': 'Please correct the errors below.'
-            })
-    else:
-        form = UserCreationForm()
+# def signup(request):
+#     if request.method == 'POST':
+#         form = UserCreationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             login(request, user)   
+#             return redirect('create_task')
+#         else:
+#             return render(request, 'signup/signup.html', {
+#                 'form': form,
+#                 'error': 'Please correct the errors below.'
+#             })
+#     else:
+#         form = UserCreationForm()
 
-    return render(request, 'signup/signup.html', {'form': form})
+#     return render(request, 'signup/signup.html', {'form': form})
+
+def signup(request):
+    if request.method == 'GET':
+        return render(request, 'signup/signup.html', {"form": UserCreationForm})
+    else:
+
+        if request.POST["password1"] == request.POST["password2"]:
+            try:
+                user = User.objects.create_user(
+                    request.POST["username"], password=request.POST["password1"])
+                user.save()
+                login(request, user)
+                return redirect('create_task')
+            except IntegrityError:
+                return render(request, 'signup/signup.html', {"form": UserCreationForm, "error": "Username already exists."})
+
+        return render(request, 'signup/signup.html', {"form": UserCreationForm, "error": "Passwords did not match."})
 
 def signin(request):
     if request.method == 'POST':

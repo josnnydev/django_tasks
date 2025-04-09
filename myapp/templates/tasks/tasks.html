@@ -1,0 +1,21 @@
+{% extends 'layouts/base2.html' %}
+{% block content %}
+{% block title %}Tasks{% endblock %}
+
+{% for task in tasks %}
+    <li>Title Task: {%if task.done %} ✅ {%else%} 🕐 {% endif %} {{ task.title }}</li>
+    <li>Description Task: {{ task.description }}</li>
+    <li>Project Name: {{ task.project.name }}</li>
+     
+    <form method="post"  hx-post="{% url 'delete_task' task.id %}" hx-target="#task-{{ task.id }} "  hx-swap="outerHTML" >
+        {% csrf_token %}
+    <div id="task-{{ task.id }}">
+    <button type="submit">Delete</button>
+    </form>
+
+     
+</div>
+{% empty %}
+    <li>No tasks available</li>
+{% endfor %}
+{% endblock %}
